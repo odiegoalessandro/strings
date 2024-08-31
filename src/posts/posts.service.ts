@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { PostEntity } from './entities/post.entity';
 
 @Injectable()
 export class PostsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createPostDto: CreatePostDto) {
-    return await this.prismaService.post.create({ data: createPostDto });
+    const post = await this.prismaService.post.create({
+      data: createPostDto,
+      include: { user: true },
+    });
+    return plainToInstance(PostEntity, post);
   }
 
   async findAll(page: number = 1, limit: number = 10) {
@@ -15,22 +21,24 @@ export class PostsService {
 
     const [data, totalItems] = await this.prismaService.$transaction([
       this.prismaService.post.findMany({
-        where: { isArchived: false },
+        where: { isArchived: false, isDeleted: false },
         skip,
         take: limit,
         orderBy: {
           id: 'desc',
         },
+        include: { user: true },
       }),
       this.prismaService.post.count({
-        where: { isArchived: false },
+        where: { isArchived: false, isDeleted: false },
       }),
     ]);
 
     const totalPages = Math.ceil(totalItems / limit);
+    const posts = data.map((post) => plainToInstance(PostEntity, post));
 
     return {
-      data,
+      data: posts,
       currentPage: page,
       totalPages,
       itemsPerPage: limit,
@@ -39,38 +47,57 @@ export class PostsService {
   }
 
   async findOne(id: number) {
-    return await this.prismaService.post.findUnique({ where: { id } });
+    const post = await this.prismaService.post.findUnique({
+      where: { id, isDeleted: false, isArchived: false },
+      include: { user: true },
+    });
+
+    return plainToInstance(PostEntity, post);
   }
 
   async findByBody(body: string) {
-    return await this.prismaService.post.findMany({
+    const posts = await this.prismaService.post.findMany({
       where: {
         body: {
           contains: body,
           mode: 'insensitive',
         },
+        isDeleted: false,
+        isArchived: false,
       },
+      include: { user: true },
     });
+
+    return posts.map((post) => plainToInstance(PostEntity, post));
   }
 
   async archivePost(id: number) {
-    return await this.prismaService.post.update({
+    const updatedPost = await this.prismaService.post.update({
       where: { id },
       data: { isArchived: true },
+      include: { user: true },
     });
+
+    return plainToInstance(PostEntity, updatedPost);
   }
 
   async unarchivePost(id: number) {
-    return await this.prismaService.post.update({
+    const updatedPost = await this.prismaService.post.update({
       where: { id },
       data: { isArchived: false },
+      include: { user: true },
     });
+
+    return plainToInstance(PostEntity, updatedPost);
   }
 
   async remove(id: number) {
-    return await this.prismaService.post.update({
+    const updatedPost = await this.prismaService.post.update({
       where: { id },
       data: { isDeleted: true },
+      include: { user: true },
     });
+
+    return plainToInstance(PostEntity, updatedPost);
   }
 }

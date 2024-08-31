@@ -22,7 +22,7 @@ export class PostsController {
 
   @ApiResponse({ type: PostEntity })
   @Post()
-  create(@Body() createPostDto: CreatePostDto): Promise<PostEntity> {
+  create(@Body() createPostDto: CreatePostDto) {
     return this.postsService.create(createPostDto);
   }
 
@@ -31,36 +31,36 @@ export class PostsController {
   findAll(
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('limit', ParseIntPipe) limit: number = 10,
-  ): Promise<FindAllPostsResponseDto> {
+  ) {
     return this.postsService.findAll(page, limit);
   }
 
   @ApiResponse({ type: [PostEntity] })
   @Get('body')
-  findByBody(@Query('body') body: string): Promise<PostEntity[]> {
+  findByBody(@Query('body') body: string) {
     return this.postsService.findByBody(body);
   }
 
   @ApiResponse({ type: PostEntity })
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<PostEntity> {
+  findOne(@Param('id') id: string) {
     return this.postsService.findOne(+id);
   }
 
   @ApiResponse({ type: PostEntity })
   @Patch(':id/archive')
-  async archivePost(@Param('id') id: number): Promise<PostEntity> {
+  async archivePost(@Param('id') id: number) {
     return this.postsService.archivePost(+id);
   }
 
   @ApiResponse({ type: PostEntity })
   @Patch(':id/unarchive')
-  async unarchivePost(@Param('id') id: number): Promise<PostEntity> {
+  async unarchivePost(@Param('id') id: number) {
     return this.postsService.unarchivePost(+id);
   }
   @ApiResponse({ type: PostEntity })
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<PostEntity> {
+  remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
   }
 }

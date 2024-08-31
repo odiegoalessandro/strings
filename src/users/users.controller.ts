@@ -10,6 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FindAllPostsResponseDto } from 'src/posts/dto/find-all-posts-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -40,6 +41,16 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<UserEntity> {
     return this.usersService.findOne(+id);
+  }
+
+  @ApiResponse({ type: FindAllPostsResponseDto })
+  @Get(':id/posts')
+  findPostsByUser(
+    @Param('id') id: string,
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
+  ) {
+    return this.usersService.findPostsByUser(+id, page, limit);
   }
 
   @ApiResponse({ type: UserEntity })
