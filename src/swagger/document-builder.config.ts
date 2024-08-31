@@ -6,5 +6,4 @@ export const documentBuilder = new DocumentBuilder()
   .setDescription(
     'Uma rede social dinamica para distruição rapida de informações',
   )
-  .addTag('strings')
   .build();
