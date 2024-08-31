@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Post } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 export class PostEntity implements Post {
   @ApiProperty({ example: 1 })
@@ -19,4 +22,9 @@ export class PostEntity implements Post {
 
   @ApiProperty({ example: 1 })
   userId: number;
+
+  @ApiProperty({ type: UserEntity })
+  @ValidateNested()
+  @Type(() => UserEntity)
+  user: UserEntity;
 }

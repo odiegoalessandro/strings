@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { PostEntity } from 'src/posts/entities/post.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllPostsByUserResponseDto } from './dto/find-all-posts-by-user.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -34,9 +37,10 @@ export class UsersService {
     ]);
 
     const totalPages = Math.ceil(totalItems / limit);
+    const users = data.map((user) => plainToInstance(UserEntity, user));
 
     return {
-      data,
+      data: users,
       currentPage: page,
       totalPages,
       itemsPerPage: limit,
@@ -45,7 +49,8 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return await this.prismaService.users.findUnique({ where: { id } });
+    const user = await this.prismaService.users.findUnique({ where: { id } });
+    return plainToInstance(UserEntity, user);
   }
 
   async findPostsByUser(
@@ -60,6 +65,7 @@ export class UsersService {
         where: { userId, isArchived: false, isDeleted: false },
         skip,
         take: limit,
+        include: { user: true },
       }),
       this.prismaService.post.count({
         where: { userId, isArchived: false, isDeleted: false },
@@ -67,9 +73,10 @@ export class UsersService {
     ]);
 
     const totalPages = Math.ceil(totalItems / limit);
+    const posts = data.map((post) => plainToInstance(PostEntity, post));
 
     return {
-      data,
+      data: posts,
       currentPage: page,
       itemsPerPage: limit,
       totalItems,
