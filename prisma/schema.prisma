@@ -20,3 +20,12 @@ model Post {
   isDeleted  Boolean  @default(false)
   created_at DateTime @default(now())
 }
+
+model Users {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  username   String   @unique
+  password   String
+  isDeleted  Boolean  @default(false)
+  created_at DateTime @default(now())
+}
