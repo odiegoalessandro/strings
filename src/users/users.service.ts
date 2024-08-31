@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FindAllPostsByUserResponseDto } from './dto/find-all-posts-by-user.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -45,6 +46,35 @@ export class UsersService {
 
   async findOne(id: number) {
     return await this.prismaService.users.findUnique({ where: { id } });
+  }
+
+  async findPostsByUser(
+    userId: number,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<FindAllPostsByUserResponseDto> {
+    const skip = (page - 1) * limit;
+
+    const [data, totalItems] = await this.prismaService.$transaction([
+      this.prismaService.post.findMany({
+        where: { userId, isArchived: false, isDeleted: false },
+        skip,
+        take: limit,
+      }),
+      this.prismaService.post.count({
+        where: { userId, isArchived: false, isDeleted: false },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      currentPage: page,
+      itemsPerPage: limit,
+      totalItems,
+      totalPages,
+    };
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
