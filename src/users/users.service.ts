@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { hash } from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { PostEntity } from 'src/posts/entities/post.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -13,7 +14,14 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.prismaService.users.create({ data: createUserDto });
+    const user = await this.prismaService.users.create({
+      data: {
+        ...createUserDto,
+        password: await hash(createUserDto.password, 10),
+      },
+    });
+
+    return plainToInstance(UserEntity, user);
   }
 
   async findAll(
