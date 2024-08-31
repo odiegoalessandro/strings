@@ -15,7 +15,7 @@ export class PostsService {
 
     const [data, totalItems] = await this.prismaService.$transaction([
       this.prismaService.post.findMany({
-        where: { isArchived: false },
+        where: { isArchived: false, isDeleted: false },
         skip,
         take: limit,
         orderBy: {
@@ -23,7 +23,7 @@ export class PostsService {
         },
       }),
       this.prismaService.post.count({
-        where: { isArchived: false },
+        where: { isArchived: false, isDeleted: false },
       }),
     ]);
 
@@ -39,7 +39,9 @@ export class PostsService {
   }
 
   async findOne(id: number) {
-    return await this.prismaService.post.findUnique({ where: { id } });
+    return await this.prismaService.post.findUnique({
+      where: { id, isDeleted: false, isArchived: false },
+    });
   }
 
   async findByBody(body: string) {
@@ -49,6 +51,8 @@ export class PostsService {
           contains: body,
           mode: 'insensitive',
         },
+        isDeleted: false,
+        isArchived: false,
       },
     });
   }

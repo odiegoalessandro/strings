@@ -19,7 +19,7 @@ model Post {
   isArchived Boolean  @default(false)
   isDeleted  Boolean  @default(false)
   created_at DateTime @default(now())
-  userId Int
+  userId     Int
 
   user Users @relation(references: [id], fields: [userId])
 }
@@ -31,5 +31,5 @@ model Users {
   password   String
   isDeleted  Boolean  @default(false)
   created_at DateTime @default(now())
-  posts Post[]
+  posts      Post[]
 }

@@ -16,4 +16,7 @@ export class PostEntity implements Post {
 
   @ApiProperty({ example: '2024-08-31T02:50:29.691Z' })
   created_at: Date;
+
+  @ApiProperty({ example: 1 })
+  userId: number;
 }
