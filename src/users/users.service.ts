@@ -61,6 +61,14 @@ export class UsersService {
     return plainToInstance(UserEntity, user);
   }
 
+  async findOneByEmail(email: string) {
+    const user = await this.prismaService.users.findUnique({
+      where: { email },
+    });
+
+    return user;
+  }
+
   async findPostsByUser(
     userId: number,
     page: number = 1,
