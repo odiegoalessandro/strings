@@ -6,12 +6,10 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post,
   Query,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllPostsResponseDto } from 'src/posts/dto/find-all-posts-response.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -21,12 +19,6 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @ApiResponse({ type: UserEntity })
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
-    return this.usersService.create(createUserDto);
-  }
 
   @ApiResponse({ type: FindAllUsersResponseDto })
   @Get()
