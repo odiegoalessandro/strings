@@ -7,7 +7,6 @@ import { SignupDto } from './dto/signup.dto';
 
 @Controller('auth')
 @ApiTags('auth')
-@ApiResponse({ type: LoginResponseDto })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -37,6 +37,7 @@ export class UsersController {
   }
 
   @ApiResponse({ type: Payload })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
   getUserProfile(@Req() req: RequestWithUser) {
