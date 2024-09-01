@@ -7,12 +7,17 @@ import {
   ParseIntPipe,
   Patch,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Payload } from 'src/auth/entities/payload.entity';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { FindAllPostsResponseDto } from 'src/posts/dto/find-all-posts-response.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { RequestWithUser } from './entities/user.interface';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
@@ -27,6 +32,14 @@ export class UsersController {
     @Query('limit', ParseIntPipe) limit: number = 10,
   ): Promise<FindAllUsersResponseDto> {
     return this.usersService.findAll(page, limit);
+  }
+
+  @ApiResponse({ type: Payload })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getUserProfile(@Req() req: RequestWithUser) {
+    return req.user;
   }
 
   @ApiResponse({ type: UserEntity })
