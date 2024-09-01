@@ -21,11 +21,13 @@ import { RequestWithUser } from './entities/user.interface';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiResponse({ type: FindAllUsersResponseDto })
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
     @Query('page', ParseIntPipe) page: number = 1,
@@ -35,7 +37,6 @@ export class UsersController {
   }
 
   @ApiResponse({ type: Payload })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
   getUserProfile(@Req() req: RequestWithUser) {
@@ -43,12 +44,14 @@ export class UsersController {
   }
 
   @ApiResponse({ type: UserEntity })
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<UserEntity> {
     return this.usersService.findOne(+id);
   }
 
   @ApiResponse({ type: FindAllPostsResponseDto })
+  @UseGuards(JwtAuthGuard)
   @Get(':id/posts')
   findPostsByUser(
     @Param('id') id: string,
@@ -59,6 +62,7 @@ export class UsersController {
   }
 
   @ApiResponse({ type: UserEntity })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -68,6 +72,7 @@ export class UsersController {
   }
 
   @ApiResponse({ type: UserEntity })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<UserEntity> {
     return this.usersService.remove(+id);
